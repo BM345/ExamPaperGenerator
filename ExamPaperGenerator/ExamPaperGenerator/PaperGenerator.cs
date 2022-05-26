@@ -10,12 +10,14 @@ namespace ExamPaperGenerator
         public Exam Exam { get; set; }
         public QuestionsDatabase QuestionsDatabase { get; set; }
         public List<Paper> Papers { get; set; }
+        public Random Random { get; set; }
 
-        public PaperGenerator(Exam exam, QuestionsDatabase questionsDatabase)
+        public PaperGenerator(Exam exam, QuestionsDatabase questionsDatabase, Random random)
         {
             Exam = exam;
             QuestionsDatabase = questionsDatabase;
             Papers = new List<Paper>();
+            Random = random;
         }
 
         public bool QuestionHasBeenUsed(string questionId)
@@ -129,11 +131,18 @@ namespace ExamPaperGenerator
         {
             var papersAndDirections = new List<Tuple<Paper, int>>();
 
+            var highestDirection = -100;
+
             foreach (var paper in Papers)
             {
                 if (CanAddQuestionToPaper(question, paper))
                 {
                     var direction = CalculateDirection(question, paper);
+
+                    if (direction > highestDirection)
+                    {
+                        highestDirection = direction;
+                    }
 
                     papersAndDirections.Add(new Tuple<Paper, int>(paper, direction));
                 }
@@ -141,7 +150,7 @@ namespace ExamPaperGenerator
 
             if (papersAndDirections.Count() > 0)
             {
-                return papersAndDirections.OrderBy(pad => pad.Item2).Last().Item1;
+                return papersAndDirections.Where(pad => pad.Item2 == highestDirection).ToList().Shuffle(Random).First().Item1;
             }
 
             return null;
@@ -187,7 +196,7 @@ namespace ExamPaperGenerator
             }
         }
 
-        public bool CheckPapersAgainstExamRules()
+        public int CheckPapersAgainstExamRules()
         {
             var m = 0;
 
@@ -258,7 +267,7 @@ namespace ExamPaperGenerator
 
             Console.WriteLine($"Papers fail to pass {m} rules.");
 
-            return m == 0;
+            return m;
         }
     }
 }

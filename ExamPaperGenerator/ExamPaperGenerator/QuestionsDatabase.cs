@@ -11,6 +11,8 @@ namespace ExamPaperGenerator
 
         public Dictionary<string, int> TagFrequencies { get; set; }
         public Dictionary<string, double> NormalisedTagFrequencies { get; set; }
+        public Dictionary<string, int> LessonFrequencies { get; set; }
+        public Dictionary<string, double> NormalisedLessonFrequencies { get; set; }
         public Dictionary<string, double> QuestionRarities { get; set; }
 
         public QuestionsDatabase(IList<Question> questions, Random random)
@@ -20,9 +22,12 @@ namespace ExamPaperGenerator
 
             TagFrequencies = new Dictionary<string, int>();
             NormalisedTagFrequencies = new Dictionary<string, double>();
+            LessonFrequencies = new Dictionary<string, int>();
+            NormalisedLessonFrequencies = new Dictionary<string, double>();
             QuestionRarities = new Dictionary<string, double>();
 
             SetTagFrequencies();
+            SetLessonFrequencies();
             SetQuestionRarities();
         }
 
@@ -49,7 +54,27 @@ namespace ExamPaperGenerator
 
             foreach (var tag in TagFrequencies)
             {
-                NormalisedTagFrequencies[tag.Key] = ((double) tag.Value) / totalNumberOfTags;
+                NormalisedTagFrequencies[tag.Key] = ((double)tag.Value) / totalNumberOfTags;
+            }
+        }
+
+        protected void SetLessonFrequencies()
+        {
+            foreach (var question in Questions)
+            {
+                if (LessonFrequencies.ContainsKey(question.LessonId))
+                {
+                    LessonFrequencies[question.LessonId]++;
+                }
+                else
+                {
+                    LessonFrequencies[question.LessonId] = 1;
+                }
+            }
+
+            foreach (var lesson in LessonFrequencies)
+            {
+                NormalisedLessonFrequencies[lesson.Key] = ((double)lesson.Value) / Questions.Count();
             }
         }
 
@@ -63,11 +88,15 @@ namespace ExamPaperGenerator
                 {
                     if (!tag.StartsWith("group:"))
                     {
-                        var frequency = NormalisedTagFrequencies[tag];
+                        var f1 = NormalisedTagFrequencies[tag];
 
-                        rarity = rarity * frequency;
+                        rarity = rarity * f1;
                     }
                 }
+
+                var f2 = NormalisedLessonFrequencies[question.LessonId];
+
+                rarity = rarity * f2;
 
                 QuestionRarities[question.Id] = rarity;
                 question.Rarity = rarity;
