@@ -17,11 +17,16 @@ namespace ExamPaperGenerator.CommandLineApplication
             var paperGenerator = new PaperGenerator(exam, questionsDatabase, random);
 
             var numberOfTries = 0;
-            var maximumNumberOfTries = 100;
+            var maximumNumberOfTries = 2;
             var bestM = 1000;
 
             while (numberOfTries < maximumNumberOfTries)
             {
+                random = new Random(numberOfTries);
+
+                questionsDatabase.Random = random;
+                paperGenerator.Random = random;
+
                 paperGenerator.GenerateNPapers(21);
                 var m = paperGenerator.CheckPapersAgainstExamRules();
 
@@ -29,6 +34,8 @@ namespace ExamPaperGenerator.CommandLineApplication
                 {
                     bestM = m;
                 }
+
+                Console.WriteLine($"Best case: {bestM}.");
 
                 if (m == 0)
                 {

@@ -6,6 +6,14 @@ namespace ExamPaperGenerator
         public int MinimumAllowedNumberOfQuestions { get; set; }
         public int MaximumAllowedNumberOfQuestions { get; set; }
 
+        public int Range
+        {
+            get
+            {
+                return MaximumAllowedNumberOfQuestions - MinimumAllowedNumberOfQuestions;
+            }
+        }
+
         public int Midpoint
         {
             get

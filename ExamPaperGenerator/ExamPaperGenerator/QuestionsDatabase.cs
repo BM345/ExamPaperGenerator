@@ -7,7 +7,7 @@ namespace ExamPaperGenerator
     public class QuestionsDatabase
     {
         public IList<Question> Questions { get; set; }
-        protected Random Random { get; set; }
+        public Random Random { get; set; }
 
         public Dictionary<string, int> TagFrequencies { get; set; }
         public Dictionary<string, double> NormalisedTagFrequencies { get; set; }

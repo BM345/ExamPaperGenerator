@@ -156,6 +156,30 @@ namespace ExamPaperGenerator
             return null;
         }
 
+        public List<List<string>> GetStrictestLessonGroups()
+        {
+            return Exam.Rules.Where(r => r is LessonGroupRule).Select(r => r as LessonGroupRule).OrderBy(r => r.Range).Select(r => r.LessonIds.ToList()).ToList();
+        }
+
+        public Dictionary<string, int> GetLessonGroupStrictnesses()
+        {
+            var strictnesses = new Dictionary<string, int>();
+
+            var n = 1;
+
+            foreach(var lessonGroup in GetStrictestLessonGroups())
+            {
+                foreach (var lesson in lessonGroup)
+                {
+                    strictnesses[lesson] = n;
+                }
+
+                n++;
+            }
+
+            return strictnesses;
+        }
+
         public void GenerateNPapers(int n)
         {
             Papers.Clear();
@@ -170,6 +194,9 @@ namespace ExamPaperGenerator
             }
 
             var questionsByRarity = QuestionsDatabase.GetQuestionsByRarity();
+            var strictnesses = GetLessonGroupStrictnesses();
+
+            questionsByRarity = questionsByRarity.OrderBy(q => strictnesses[q.LessonId]).ThenBy(q => q.Rarity);
 
             foreach (var question in questionsByRarity)
             {
