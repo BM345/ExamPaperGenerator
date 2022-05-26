@@ -7,10 +7,6 @@ namespace ExamPaperGenerator
 {
     public class QuestionsImporter
     {
-        public QuestionsImporter()
-        {
-        }
-
         protected static string GetXMLAttribute(XmlElement xmlElement, string attributeName, string defaultValue)
         {
             if (xmlElement.HasAttribute(attributeName))
@@ -43,11 +39,11 @@ namespace ExamPaperGenerator
             {
                 question.Tags.Add("shallow:has_fillable_space");
             }
+
             if (a2 == "none")
             {
                 question.Tags.Add("shallow:does_not_have_figure");
             }
-
             if (a2 == "diagram")
             {
                 question.Tags.Add("shallow:has_figure");

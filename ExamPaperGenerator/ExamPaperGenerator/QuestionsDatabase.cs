@@ -27,10 +27,16 @@ namespace ExamPaperGenerator
             return objects[n];
         }
 
+
+
         public IEnumerable<Question> GetQuestionsExcluding(IEnumerable<Question> excluding)
         {
-            return Questions.Where(q => !excluding.Any(q2 => q2.Id == q.Id));
+            var excludingIds = excluding.Select(q => q.Id).ToList();
+
+            return Questions.Where(q => q.Id.IsNotIn(excludingIds));
         }
+
+
 
         public Question GetRandomQuestion()
         {
@@ -41,15 +47,17 @@ namespace ExamPaperGenerator
         {
             var excludingIds = excluding.Select(q => q.Id).ToList();
 
-            return RandomChoice(Questions.Where(q => !q.Id.IsIn(excludingIds)).ToList());
+            return RandomChoice(Questions.Where(q => q.Id.IsNotIn(excludingIds)).ToList());
         }
 
         public IEnumerable<Question> GetNRandomQuestions(int n, IEnumerable<Question> excluding)
         {
             var excludingIds = excluding.Select(q => q.Id).ToList();
 
-            return Questions.Where(q => !q.Id.IsIn(excludingIds)).ToList().Shuffle(Random).Take(n);
+            return Questions.Where(q => q.Id.IsNotIn(excludingIds)).ToList().Shuffle(Random).Take(n);
         }
+
+
 
         public IEnumerable<Question> GetQuestionsInLesson(string lessonId)
         {
@@ -58,7 +66,9 @@ namespace ExamPaperGenerator
 
         public IEnumerable<Question> GetQuestionsInLesson(string lessonId, IEnumerable<Question> excluding)
         {
-            return Questions.Where(q => q.LessonId == lessonId && !excluding.Any(q2 => q2.Id == q.Id));
+            var excludingIds = excluding.Select(q => q.Id).ToList();
+
+            return Questions.Where(q => q.LessonId == lessonId && q.Id.IsNotIn(excludingIds));
         }
 
         public Question GetRandomQuestionInLesson(string lessonId)
@@ -71,14 +81,18 @@ namespace ExamPaperGenerator
             return RandomChoice(GetQuestionsInLesson(lessonId, excluding).ToList());
         }
 
+
+
         public IEnumerable<Question> GetQuestionsInLessons(IEnumerable<string> lessonIds)
         {
-            return Questions.Where(q => lessonIds.Any(lid => q.LessonId == lid));
+            return Questions.Where(q => q.LessonId.IsIn(lessonIds));
         }
 
         public IEnumerable<Question> GetQuestionsInLessons(IEnumerable<string> lessonIds, IEnumerable<Question> excluding)
         {
-            return Questions.Where(q => lessonIds.Any(lid => q.LessonId == lid) && !excluding.Any(q2 => q2.Id == q.Id));
+            var excludingIds = excluding.Select(q => q.Id).ToList();
+
+            return Questions.Where(q => q.LessonId.IsIn(lessonIds) && q.Id.IsNotIn(excludingIds));
         }
 
         public Question GetRandomQuestionInLessons(IEnumerable<string> lessonIds)
@@ -91,14 +105,18 @@ namespace ExamPaperGenerator
             return RandomChoice(GetQuestionsInLessons(lessonIds, excluding).ToList());
         }
 
+
+
         public IEnumerable<Question> GetQuestionsWithTag(string tag)
         {
-            return Questions.Where(q => q.Tags.Any(t => t == tag));
+            return Questions.Where(q => tag.IsIn(q.Tags));
         }
 
         public IEnumerable<Question> GetQuestionsWithTag(string tag, IEnumerable<Question> excluding)
         {
-            return Questions.Where(q => q.Tags.Any(t => t == tag) && !excluding.Any(q2 => q2.Id == q.Id));
+            var excludingIds = excluding.Select(q => q.Id).ToList();
+
+            return Questions.Where(q => tag.IsIn(q.Tags) && q.Id.IsNotIn(excludingIds));
         }
 
         public Question GetRandomQuestionWithTag(string tag)
@@ -111,6 +129,8 @@ namespace ExamPaperGenerator
             return RandomChoice(GetQuestionsWithTag(tag, excluding).ToList());
         }
 
+
+
         public IEnumerable<Question> GetQuestionsWithTags(IEnumerable<string> tags)
         {
             return Questions.Where(q => !tags.Where(t1 => !q.Tags.Any(t2 => t2 == t1)).Any());
@@ -118,7 +138,9 @@ namespace ExamPaperGenerator
 
         public IEnumerable<Question> GetQuestionsWithTags(IEnumerable<string> tags, IEnumerable<Question> excluding)
         {
-            return Questions.Where(q => !tags.Where(t1 => !q.Tags.Any(t2 => t2 == t1)).Any() && !excluding.Any(q2 => q2.Id == q.Id));
+            var excludingIds = excluding.Select(q => q.Id).ToList();
+
+            return Questions.Where(q => !tags.Where(t1 => !q.Tags.Any(t2 => t2 == t1)).Any() && q.Id.IsNotIn(excludingIds));
         }
 
         public Question GetRandomQuestionWithTags(IEnumerable<string> tags)

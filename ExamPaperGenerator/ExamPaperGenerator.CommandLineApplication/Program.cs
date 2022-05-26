@@ -32,7 +32,7 @@ namespace ExamPaperGenerator.CommandLineApplication
             var questionsDatabase = new QuestionsDatabase(questions, new Random(1));
             var paperGenerator = new PaperGenerator(exam, questionsDatabase);
 
-            paperGenerator.GenerateNPapers(21);
+            paperGenerator.GenerateNPapers(1);
             paperGenerator.CheckPapersAgainstExamRules();
             paperGenerator.ExportPapers(@"/Users/benjaminmilnes/Documents/GitHub/NagwaSchemas/exam_profile/alternate_method");
         }

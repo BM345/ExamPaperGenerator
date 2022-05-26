@@ -10,5 +10,10 @@ namespace ExamPaperGenerator
         {
             return e.Any(s1 => s1 == s);
         }
+
+        public static bool IsNotIn(this string s, IEnumerable<string> e)
+        {
+            return !s.IsIn(e);
+        }
     }
 }

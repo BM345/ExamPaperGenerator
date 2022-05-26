@@ -5,10 +5,6 @@ namespace ExamPaperGenerator
 {
     public class PaperExporter
     {
-        public PaperExporter()
-        {
-        }
-
         public static void ExportPaper(Paper paper, string filePath)
         {
             var xmlDocument = new XmlDocument();
@@ -26,21 +22,44 @@ namespace ExamPaperGenerator
             e5.InnerText += $"- Total number of questions in the paper: {paper.NumberOfQuestions}.\n";
             e5.InnerText += $"- Total number of unique questions in the paper: {paper.NumberOfUniqueQuestions}.\n";
 
-            foreach(var rule in paper.Exam.Rules)
+            var m = 0;
+
+            foreach (var rule in paper.Exam.Rules)
             {
                 if (rule is TagRule)
                 {
                     var r = rule as TagRule;
 
-                    e5.InnerText += $"- Number of questions in the paper with the tag {r.Tag}: {paper.NumberOfQuestionsWithTag(r.Tag)} (should be {r.MinimumAllowedNumberOfQuestions}-{r.MaximumAllowedNumberOfQuestions}).\n";
+                    var n = paper.NumberOfQuestionsWithTag(r.Tag);
+                    var ll = r.MinimumAllowedNumberOfQuestions;
+                    var ul = r.MaximumAllowedNumberOfQuestions;
+
+                    e5.InnerText += $"- Number of questions in the paper with the tag '{r.Tag}': {n} (should be {ll}-{ul}).\n";
+
+                    if (n < ll || n > ul)
+                    {
+                        m++;
+                    }
                 }
                 if (rule is LessonGroupRule)
                 {
                     var r = rule as LessonGroupRule;
 
-                    e5.InnerText += $"- Number of questions in the paper from the lessons {string.Join(", ", r.LessonIds)}: {paper.NumberOfQuestionsInLessons(r.LessonIds)} (should be {r.MinimumAllowedNumberOfQuestions}-{r.MaximumAllowedNumberOfQuestions}).\n";
+                    var n = paper.NumberOfQuestionsInLessons(r.LessonIds);
+                    var ll = r.MinimumAllowedNumberOfQuestions;
+                    var ul = r.MaximumAllowedNumberOfQuestions;
+
+                    e5.InnerText += $"- Number of questions in the paper from the lessons {string.Join(", ", r.LessonIds)}: {n} (should be {ll}-{ul}).\n";
+
+                    if (n < ll || n > ul)
+                    {
+                        m++;
+                    }
                 }
             }
+
+            e5.InnerText += "\n";
+            e5.InnerText += $"{m} fails.\n";
 
             e1.AppendChild(e5);
 

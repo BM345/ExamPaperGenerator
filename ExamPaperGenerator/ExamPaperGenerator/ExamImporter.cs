@@ -7,10 +7,6 @@ namespace ExamPaperGenerator
 {
     public class ExamImporter
     {
-        public ExamImporter()
-        {
-        }
-
         protected static string GetXMLAttribute(XmlElement xmlElement, string attributeName, string defaultValue)
         {
             if (xmlElement.HasAttribute(attributeName))
