@@ -9,11 +9,82 @@ namespace ExamPaperGenerator
         public IList<Question> Questions { get; set; }
         protected Random Random { get; set; }
 
+        public Dictionary<string, int> TagFrequencies { get; set; }
+        public Dictionary<string, double> NormalisedTagFrequencies { get; set; }
+        public Dictionary<string, double> QuestionRarities { get; set; }
+
         public QuestionsDatabase(IList<Question> questions, Random random)
         {
             Questions = questions;
             Random = random;
+
+            TagFrequencies = new Dictionary<string, int>();
+            NormalisedTagFrequencies = new Dictionary<string, double>();
+            QuestionRarities = new Dictionary<string, double>();
+
+            SetTagFrequencies();
+            SetQuestionRarities();
         }
+
+        protected void SetTagFrequencies()
+        {
+            var totalNumberOfTags = 0.0;
+
+            foreach (var question in Questions)
+            {
+                foreach (var tag in question.Tags)
+                {
+                    if (TagFrequencies.ContainsKey(tag))
+                    {
+                        TagFrequencies[tag]++;
+                    }
+                    else
+                    {
+                        TagFrequencies[tag] = 1;
+                    }
+
+                    totalNumberOfTags++;
+                }
+            }
+
+            foreach (var tag in TagFrequencies)
+            {
+                NormalisedTagFrequencies[tag.Key] = ((double) tag.Value) / totalNumberOfTags;
+            }
+        }
+
+        protected void SetQuestionRarities()
+        {
+            foreach (var question in Questions)
+            {
+                var rarity = 1.0;
+
+                foreach (var tag in question.Tags)
+                {
+                    if (!tag.StartsWith("group:"))
+                    {
+                        var frequency = NormalisedTagFrequencies[tag];
+
+                        rarity = rarity * frequency;
+                    }
+                }
+
+                QuestionRarities[question.Id] = rarity;
+                question.Rarity = rarity;
+            }
+        }
+
+        public double GetQuestionRarity(Question question)
+        {
+            return QuestionRarities[question.Id];
+        }
+
+        public IEnumerable<Question> GetQuestionsByRarity()
+        {
+            return Questions.OrderBy(q => q.Rarity);
+        }
+
+
 
         protected int RandomNumberBetween(int lowerLimit, int upperLimit)
         {

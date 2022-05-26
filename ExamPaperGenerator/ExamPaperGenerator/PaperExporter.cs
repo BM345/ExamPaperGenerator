@@ -19,7 +19,6 @@ namespace ExamPaperGenerator
             var e5 = xmlDocument.CreateElement("statistics");
 
             e5.InnerText += "\n";
-            e5.InnerText += $"- Total number of questions in the paper: {paper.NumberOfQuestions}.\n";
             e5.InnerText += $"- Total number of unique questions in the paper: {paper.NumberOfUniqueQuestions}.\n";
 
             var m = 0;
@@ -33,8 +32,9 @@ namespace ExamPaperGenerator
                     var n = paper.NumberOfQuestionsWithTag(r.Tag);
                     var ll = r.MinimumAllowedNumberOfQuestions;
                     var ul = r.MaximumAllowedNumberOfQuestions;
+                    var s = (n >= ll && n <= ul) ? "✓" : "✗";
 
-                    e5.InnerText += $"- Number of questions in the paper with the tag '{r.Tag}': {n} (should be {ll}-{ul}).\n";
+                    e5.InnerText += $"- Number of questions in the paper with the tag '{r.Tag}': {n} (should be {ll}-{ul}). {s}\n";
 
                     if (n < ll || n > ul)
                     {
@@ -48,8 +48,25 @@ namespace ExamPaperGenerator
                     var n = paper.NumberOfQuestionsInLessons(r.LessonIds);
                     var ll = r.MinimumAllowedNumberOfQuestions;
                     var ul = r.MaximumAllowedNumberOfQuestions;
+                    var s = (n >= ll && n <= ul) ? "✓" : "✗";
 
-                    e5.InnerText += $"- Number of questions in the paper from the lessons {string.Join(", ", r.LessonIds)}: {n} (should be {ll}-{ul}).\n";
+                    e5.InnerText += $"- Number of questions in the paper from the lessons {string.Join(", ", r.LessonIds)}: {n} (should be {ll}-{ul}). {s}\n";
+
+                    if (n < ll || n > ul)
+                    {
+                        m++;
+                    }
+                }
+                if (rule is TotalCountRule)
+                {
+                    var r = rule as TotalCountRule;
+
+                    var n = paper.NumberOfQuestions;
+                    var ll = r.MinimumAllowedNumberOfQuestions;
+                    var ul = r.MaximumAllowedNumberOfQuestions;
+                    var s = (n >= ll && n <= ul) ? "✓" : "✗";
+
+                    e5.InnerText += $"- Total number of questions in the paper: {n} (should be {ll}-{ul}). {s}\n";
 
                     if (n < ll || n > ul)
                     {

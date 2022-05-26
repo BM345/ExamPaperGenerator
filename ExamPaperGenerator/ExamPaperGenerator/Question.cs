@@ -9,6 +9,7 @@ namespace ExamPaperGenerator
         public string Id { get; set; }
         public string LessonId { get; set; }
         public IList<string> Tags { get; set; }
+        public double Rarity { get; set; }
 
         public Question()
         {

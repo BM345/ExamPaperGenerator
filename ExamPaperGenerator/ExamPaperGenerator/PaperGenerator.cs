@@ -98,7 +98,7 @@ namespace ExamPaperGenerator
                         var d1 = Math.Abs(n1 - r.Midpoint);
                         var d2 = Math.Abs(n2 - r.Midpoint);
 
-                        direction += -(d2 - d1);
+                        direction += -(d2 - d1) * 2;
                     }
                 }
             }
@@ -125,6 +125,28 @@ namespace ExamPaperGenerator
             return null;
         }
 
+        public Paper GetBestPaperToAddQuestionTo(Question question)
+        {
+            var papersAndDirections = new List<Tuple<Paper, int>>();
+
+            foreach (var paper in Papers)
+            {
+                if (CanAddQuestionToPaper(question, paper))
+                {
+                    var direction = CalculateDirection(question, paper);
+
+                    papersAndDirections.Add(new Tuple<Paper, int>(paper, direction));
+                }
+            }
+
+            if (papersAndDirections.Count() > 0)
+            {
+                return papersAndDirections.OrderBy(pad => pad.Item2).Last().Item1;
+            }
+
+            return null;
+        }
+
         public void GenerateNPapers(int n)
         {
             Papers.Clear();
@@ -136,20 +158,19 @@ namespace ExamPaperGenerator
                 paper.Exam = Exam;
 
                 Papers.Add(paper);
+            }
 
-                var tries = 0;
-                var maximumTries = 1000;
+            var questionsByRarity = QuestionsDatabase.GetQuestionsByRarity();
 
-                while (tries < maximumTries)
+            foreach (var question in questionsByRarity)
+            {
+                var paper = GetBestPaperToAddQuestionTo(question);
+
+                if (paper != null)
                 {
-                    var question1 = GetBestQuestionToAdd(paper);
+                    var direction = CalculateDirection(question, paper);
 
-                    if (CanAddQuestionToPaper(question1, paper))
-                    {
-                            paper.Questions.Add(question1);
-                    }
-
-                    tries++;
+                    paper.Questions.Add(question);
                 }
             }
         }
@@ -230,6 +251,8 @@ namespace ExamPaperGenerator
                             m++;
                         }
                     }
+
+                    n++;
                 }
             }
 
