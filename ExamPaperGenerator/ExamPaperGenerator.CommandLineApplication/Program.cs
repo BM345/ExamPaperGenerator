@@ -17,8 +17,10 @@ namespace ExamPaperGenerator.CommandLineApplication
             var paperGenerator = new PaperGenerator(exam, questionsDatabase, random);
 
             var numberOfTries = 0;
-            var maximumNumberOfTries = 2;
+            var maximumNumberOfTries = 1000;
             var bestM = 1000;
+            var worstM = 0;
+            var averageM = 0.0;
 
             while (numberOfTries < maximumNumberOfTries)
             {
@@ -35,7 +37,14 @@ namespace ExamPaperGenerator.CommandLineApplication
                     bestM = m;
                 }
 
-                Console.WriteLine($"Best case: {bestM}.");
+                if (m > worstM)
+                {
+                    worstM = m;
+                }
+
+                averageM = (averageM * numberOfTries + m) / (numberOfTries + 1);
+
+                Console.WriteLine($"Best case: {bestM}. Worst case: {worstM}. Average case: {averageM}.");
 
                 if (m == 0)
                 {

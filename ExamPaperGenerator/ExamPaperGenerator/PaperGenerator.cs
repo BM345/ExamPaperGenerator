@@ -100,7 +100,7 @@ namespace ExamPaperGenerator
                         var d1 = Math.Abs(n1 - r.Midpoint);
                         var d2 = Math.Abs(n2 - r.Midpoint);
 
-                        direction += -(d2 - d1) * 2;
+                        direction += -(d2 - d1) * 1;
                     }
                 }
             }
@@ -180,7 +180,7 @@ namespace ExamPaperGenerator
             return strictnesses;
         }
 
-        public void GenerateNPapers(int n)
+        public void GenerateNPapers(int n, double p1 = 0.3, double p2 = 0.3)
         {
             Papers.Clear();
 
@@ -196,7 +196,9 @@ namespace ExamPaperGenerator
             var questionsByRarity = QuestionsDatabase.GetQuestionsByRarity();
             var strictnesses = GetLessonGroupStrictnesses();
 
-            questionsByRarity = questionsByRarity.OrderBy(q => strictnesses[q.LessonId]).ThenBy(q => q.Rarity);
+            var p3 = Random.NextDouble() * (p2 - p1) + p1;
+
+            questionsByRarity = questionsByRarity.OrderBy(q => strictnesses[q.LessonId]).ThenBy(q => q.Rarity * (Random.NextDouble() * p3  + 1));
 
             foreach (var question in questionsByRarity)
             {
